@@ -48,7 +48,13 @@ def audio_data_making(txtfile,files,label_name,root_dir='/content/drive/My Drive
 
     for aud in tqdm(files):
         name = aud.split('/')[-1].split('.wav')[0]
-        print(name+'.wav')
+        
+        try:
+            os.mkdir('chunks')
+        except:
+            print('chunks directory is already present')
+        
+        
         if len(audio_dict[root_dir+label_name+'/'+name+'.wav']) > 0:
             y,sr = librosa.load(aud,sr = 41000)
             time_duration = librosa.get_duration(y,sr)
