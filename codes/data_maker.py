@@ -30,8 +30,8 @@ def chunk(wav,t1,t2,newf):
     newAudio = AudioSegment.from_wav(wav)
     newAudio = newAudio[t1:t2]
     newAudio.export(newf, format="wav")
-    
-def audio_data_making(txtfile,files):
+
+def audio_data_making(txtfile,files,label_name,root_dir='/content/drive/My Drive/'):
     f  = open(txtfile)
     data = f.read()
     audio_dict = dict()
@@ -42,22 +42,20 @@ def audio_data_making(txtfile,files):
         except:
             print('some error in for loop')
             
-        audio_dict[d[0]+'.wav'] = t
-    
-    try:
-      os.mkdir('chunks/')
-    except:
-      print('directory is already present')
+        audio_dict[root_dir+label_name+'/'+d[0]+'.wav'] = t
+
+    # print(audio_dict)
 
     for aud in tqdm(files):
-        name = aud.split('\\')[1].split('.wav')[0]
-        if len(audio_dict[name+'.wav']) > 0:
+        name = aud.split('/')[-1].split('.wav')[0]
+        print(name+'.wav')
+        if len(audio_dict[root_dir+label_name+'/'+name+'.wav']) > 0:
             y,sr = librosa.load(aud,sr = 41000)
             time_duration = librosa.get_duration(y,sr)
             for t1 in range(int(time_duration)-10):
                 t2 = t1+10
                 category = '-'
-                for j in audio_dict[name+'.wav']:
+                for j in audio_dict[root_dir+label_name+'/'+name+'.wav']:
                     tt1,tt2,cat = j
                     if tt1-t1>0 and tt2-t2<0:
                         category = category+','+cat
