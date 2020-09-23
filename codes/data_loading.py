@@ -97,7 +97,7 @@ def get_data(perfect,f,r,fandr,batch=8,size = (256*8,256),root_path = '/content/
             imp_data.append([image,labels])
             # print('perfect')
 
-        imp_data = shuffle(imp_data)
+        shuffle(imp_data)
         # imp_data = np.array(imp_data)
 
         # print(imp_data.shape)
