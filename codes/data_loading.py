@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from random import shuffle
+from random import shuffle,choice,randrange
 import cv2
 
 def get_csv_data(path):
@@ -53,10 +53,30 @@ def train_test_val_split(df):
     train_df    ,val_df     = splitting(train_df)
     return (train_df,test_df,val_df)
 
-def get_data(perfect,f,r,fandr,batch=8,size = (256*8,256),root_path = '/content/spectrograms/'):
+def agumentation(img,domain,x=0,y=0,h=0,w=0):
+    '''
+    this function helps to mask the different axis
+    x - time and y - frequency in a spectrogram
+
+    input enter image as a numpy array,domains( anyone among time,frequency,timeandfrequency),
+    x,w for time
+    y,h for frequency,
+    x,w , y,h for time and frequency
+    
+    '''
+
+    if domain == 'frequency':
+      img[y:y+h,:,:] = 0
+    if domain == 'time':
+      img[:,x:x+w,:] = 0
+    if domain == 'timeandfrequency':
+      img[x:x+w,y:y+h,:] =0
+    return img  
+
+
+def get_data(perfect,f,r,fandr,batch=8,size = (256*8,256),root_path = '/content/spectrograms/',agumentation_masking = False):
     while True:
         imp_data = []
-        count = 0
 
         def read_image(file_name):
             img = cv2.imread(file_name,0)
@@ -106,6 +126,17 @@ def get_data(perfect,f,r,fandr,batch=8,size = (256*8,256),root_path = '/content/
         # print(np.array(images).shape)
         labels = [i[1] for i in imp_data]
 
+        if agumentation_masking == True:
+            domain_list = ['frequency','time','timeandfrequency']
+            for no,i in enumerate(images):
+
+                d = choice(domain_list)
+
+                x = randrange(0, size[0]-100)
+                y = randrange(0, size[1]-20)
+
+                aug_img = agumentation(i,d,x=x,y=y,h=20,w=100)
+                images[no] = aug_img
         yield (np.array(images)/255,np.array(labels))
 
 
